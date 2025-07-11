@@ -1,0 +1,11 @@
+{
+  "prettier/prettier": [
+    "error",
+    {},
+    {
+      "fileInfoOptions": {
+        "withNodeModules": true
+      }
+    }
+  ]
+}
