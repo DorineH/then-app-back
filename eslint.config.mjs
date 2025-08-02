@@ -4,6 +4,11 @@ import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
+module.exports = [
+  // Any other config imports go at the top
+  eslintPluginPrettierRecommended,
+];
+
 export default tseslint.config(
   {
     ignores: ["eslint.config.mjs"],

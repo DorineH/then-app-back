@@ -1,10 +1,25 @@
 {
   "prettier/prettier": [
     "error",
-    {},
+    {
+      "singleQuote": true,
+      "parser": "flow"
+    },
+    {
+      "usePrettierrc": false
+    },
     {
       "fileInfoOptions": {
         "withNodeModules": true
+      }
+    },
+    {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      },
+      "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
       }
     }
   ]
