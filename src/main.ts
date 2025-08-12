@@ -8,14 +8,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-      "http://192.168.1.99:3000",
-    ], // en prod https://then.app
+    origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
-    credentials: true,
   });
 
   const config = new DocumentBuilder()
