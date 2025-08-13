@@ -11,6 +11,14 @@ export class FavoriteCategory {
   @Column()
   name: string;
 
+  @Column({ type: 'array', nullable: true })
+  fields: {
+    name: string;
+    label: string;
+    required: boolean;
+    type: "text" | "url" | "number" | "date";
+  }[];
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

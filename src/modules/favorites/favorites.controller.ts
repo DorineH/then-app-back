@@ -70,19 +70,19 @@ export class FavoritesController {
   //     return this.favoritesService.getAllFavoritesHistory(coupleId);
   //   }
 
-  @Delete(":id")
-  @ApiOperation({ summary: "Supprimer un favori" })
-  async deleteFavorite(
-    @Req() req,
-    @Param("id") id: string,
-  ): Promise<{ deleted: boolean }> {
-    const { userId } = req.user;
-    const result = await this.favoritesService.deleteFavorite(id, userId);
-    if (!result) {
-      throw new ForbiddenException(
-        "Suppression non autorisée ou favori introuvable",
-      );
-    }
-    return { deleted: true };
-  }
+  // @Delete(":id")
+  // @ApiOperation({ summary: "Supprimer un favori" })
+  // async deleteFavorite(
+  //   @Req() req,
+  //   @Param("id") id: string,
+  // ): Promise<{ deleted: boolean }> {
+  //   const { userId } = req.user;
+  //   const result = await this.favoritesService.deleteFavorite(id, userId);
+  //   if (!result) {
+  //     throw new ForbiddenException(
+  //       "Suppression non autorisée ou favori introuvable",
+  //     );
+  //   }
+  //   return { deleted: true };
+  // }
 }

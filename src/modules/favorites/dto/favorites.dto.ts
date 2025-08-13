@@ -4,8 +4,10 @@ import {
   IsOptional,
   IsUrl,
   IsObject,
+  ValidateNested,
 } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 
 export class CreateFavoriteDto {
   @ApiProperty({ example: "musique", description: "Catégorie du favori" })
@@ -13,20 +15,34 @@ export class CreateFavoriteDto {
   @IsNotEmpty()
   category: string;
 
-  @ApiProperty({ example: "Peaches", description: "Titre du favori (obligatoire pour toutes les catégories)" })
+  @ApiProperty({
+    example: "Peaches",
+    description: "Titre du favori (obligatoire pour toutes les catégories)",
+  })
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: "Description du favori", description: "Description (obligatoire pour les catégories génériques)" })
-  @IsOptional()
-  @IsString()
-  description?: string;
+  // @ApiProperty({
+  //   example: "Description du favori",
+  //   description: "Description (obligatoire pour les catégories génériques)",
+  // })
+  // @IsOptional()
+  // @IsString()
+  // description?: string;
 
-  @ApiProperty({ example: "Justin Bieber", description: "Artiste (musique), Réalisateur (film), Auteur (livre)" })
+  // @ApiProperty({ example: "Justin Bieber", description: "Artiste (musique), Réalisateur (film), Auteur (livre)" })
+  // @IsOptional()
+  // @IsString()
+  // authorOrArtistOrDirector?: string;
+  @ApiProperty({
+    required: false,
+    example: { titre: 'Mercredi', description: 'Top', realisateur: 'Burton' },
+    description: "Champs dynamiques de la catégorie (clé = name du champ)",
+  })
   @IsOptional()
-  @IsString()
-  authorOrArtistOrDirector?: string;
+  @IsObject()
+  fields?: Record<string, string>;
 
   @ApiProperty({
     required: false,
@@ -74,9 +90,35 @@ export class FavoriteResponseDto {
   readonly createdAt: Date;
 }
 
+export class CategoryFieldDefinitionDto {
+  @ApiProperty({ example: "titre" })
+  @IsString()
+  name: string;
+
+  @ApiProperty({ example: "Titre" })
+  @IsString()
+  label: string;
+
+  @ApiProperty({ example: true })
+  required: boolean;
+
+  @ApiProperty({ example: "text", enum: ["text", "url", "number", "date"] })
+  @IsString()
+  type: "text" | "url" | "number" | "date";
+}
+
 export class CreateCategoryDto {
-  @ApiProperty({ example: 'music' })
+  @ApiProperty({ example: "music" })
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @ApiProperty({
+    title: "test titre",
+    type: [CategoryFieldDefinitionDto],
+    description: "Définition des champs de la catégorie (autant que souhaité)",
+  })
+  @ValidateNested({ each: true })
+  @Type(() => CategoryFieldDefinitionDto)
+  fields: CategoryFieldDefinitionDto[];
 }
