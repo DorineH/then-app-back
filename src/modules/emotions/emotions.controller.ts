@@ -17,21 +17,25 @@ import { EmotionEntity } from "./entities/emotions.entity";
 
 @ApiTags("Emotions")
 @Controller("/emotion")
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth("bearerAuth")
 export class EmotionsController {
   constructor(private readonly emotionsService: EmotionsService) {}
 
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Créer une émotion" })
   @Post("addEmotion")
-  @UseGuards(JwtAuthGuard)
+  //   @UseGuards(JwtAuthGuard)
   async createEmotion(
     @Req() req: any,
     @Body() dto: CreateEmotionDto,
   ): Promise<EmotionEntity> {
     try {
       const { userId, coupleId } = req.user;
-      const emotion = await this.emotionsService.createOrUpdateEmotion(userId, coupleId, dto);
+      const emotion = await this.emotionsService.createOrUpdateEmotion(
+        userId,
+        coupleId,
+        dto,
+      );
       return emotion;
     } catch (error) {
       console.error("Erreur createEmotion:", error);
@@ -41,15 +45,17 @@ export class EmotionsController {
     }
   }
 
-  @ApiBearerAuth()
+  //   @ApiBearerAuth("bearerAuth")
   @ApiOperation({ summary: "Récuperer les émotions" })
   @Get("getEmotions")
-  @UseGuards(JwtAuthGuard)
+  //   @UseGuards(JwtAuthGuard)
   // @Req() req: any,
-  async getCurrent(@Query("coupleId") coupleId: string) {
+  //  @Query("coupleId") coupleId?: string
+  async getCurrent(@Req() req: any) {
     try {
-      console.log(await this.emotionsService.getCurrentEmotions(coupleId));
-      return await this.emotionsService.getCurrentEmotions(coupleId);
+      const cid = req.user?.coupleId;
+
+      return await this.emotionsService.getCurrentEmotions(cid);
     } catch (error) {
       console.error("Erreur getCurrentEmotions:", error);
       throw new InternalServerErrorException(
@@ -58,14 +64,18 @@ export class EmotionsController {
     }
   }
 
-  @ApiBearerAuth()
+  //   @ApiBearerAuth("bearerAuth")
   @ApiOperation({ summary: "Récuperer la dernière émotions" })
   @Get("lastEmotionByUser")
-  @UseGuards(JwtAuthGuard)
-  async getLastEmotionPerUser(@Query("coupleId") coupleId: string) {
+  //   @UseGuards(JwtAuthGuard)
+  async getLastEmotionPerUser(
+    @Req() req: any,
+    // @Query("coupleId") coupleId?: string,
+  ) {
     try {
-      //   const coupleId = req.user.coupleId;
-      return await this.emotionsService.getLastEmotionsByUser(coupleId);
+      const cid = req.user?.coupleId;
+
+      return await this.emotionsService.getLastEmotionsByUser(cid);
     } catch (error) {
       console.error("Erreur getLastEmotionPerUser:", error);
       throw new InternalServerErrorException(
@@ -74,11 +84,11 @@ export class EmotionsController {
     }
   }
 
-  @ApiBearerAuth()
+  //   @ApiBearerAuth("bearerAuth")
   @Delete()
   async deleteMyEmotion(@Req() req: any) {
-    const userId = req.user["sub"];
-    const coupleId = req.user["coupleId"];
+    const { userId, coupleId } = req.user;
+
     return this.emotionsService.deleteEmotion(userId, coupleId);
   }
 }

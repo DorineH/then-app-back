@@ -17,6 +17,7 @@ export class EmotionsService {
     coupleId: string,
     dto: CreateEmotionDto,
   ): Promise<EmotionEntity> {
+
     // const now = new Date();
     // const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
 
@@ -43,6 +44,7 @@ export class EmotionsService {
   }
 
   async getCurrentEmotions(coupleId: string) {
+
     return await this.emotionRepo.find({
       where: { coupleId },
       order: { date: "DESC" },
