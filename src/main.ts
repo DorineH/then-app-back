@@ -1,5 +1,5 @@
-// import * as nodeCrypto from 'node:crypto';
-
+import * as nodeCrypto from 'node:crypto';
+(globalThis as any).crypto = nodeCrypto as any;
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
