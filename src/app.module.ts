@@ -9,6 +9,10 @@ import { FavoriteCategory } from "./modules/favorites/entities/category.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { EmotionEntity } from "./modules/emotions/entities/emotions.entity";
 import { EmotionsModule } from "./modules/emotions/emotions.module";
+import { TasksModule } from "./modules/tasks/task.module";
+import { TaskEntity } from "./modules/tasks/entities/task.entity";
+import { APP_GUARD } from "@nestjs/core";
+import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 
 @Module({
   imports: [
@@ -16,10 +20,10 @@ import { EmotionsModule } from "./modules/emotions/emotions.module";
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'mongodb',
-        url: configService.get<string>('MONGODB_URI'),
+        type: "mongodb",
+        url: configService.get<string>("MONGODB_URI"),
         useUnifiedTopology: true,
-        entities: [Favorite, FavoriteCategory, EmotionEntity],
+        entities: [Favorite, FavoriteCategory, EmotionEntity, TaskEntity],
         synchronize: true, // set to false in production
       }),
       inject: [ConfigService],
@@ -28,8 +32,9 @@ import { EmotionsModule } from "./modules/emotions/emotions.module";
     FavoriteModule,
     EmotionsModule,
     AuthModule,
+    TasksModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule {}
