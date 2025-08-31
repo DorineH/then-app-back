@@ -9,6 +9,41 @@ import {
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 
+export class CategoryFieldDefinitionDto {
+  @ApiProperty({ example: "titre" })
+  @IsString()
+  name: string;
+
+  @ApiProperty({ example: "Titre" })
+  @IsString()
+  label: string;
+
+  @ApiProperty({ example: true })
+  required: boolean;
+
+  @ApiProperty({ example: "text", enum: ["text", "url", "number", "date"] })
+  @IsString()
+  type: "text" | "url" | "number" | "date";
+}
+
+export class CategoryResponseDto {
+  @ApiProperty()
+  readonly id: string;
+
+  @ApiProperty()
+  readonly name: string;
+
+  @ApiProperty({
+    required: false,
+    example: "🎵",
+    description: "Icône de la catégorie (emoji ou url)",
+  })
+  readonly icon?: string;
+
+  @ApiProperty({ type: [CategoryFieldDefinitionDto] })
+  readonly fields: CategoryFieldDefinitionDto[];
+}
+
 export class CreateFavoriteDto {
   @ApiProperty({ example: "musique", description: "Catégorie du favori" })
   @IsString()
@@ -17,32 +52,29 @@ export class CreateFavoriteDto {
 
   @ApiProperty({
     example: "Peaches",
-    description: "Titre du favori (obligatoire pour toutes les catégories)",
-  })
-  @IsString()
-  @IsNotEmpty()
-  title: string;
-
-  // @ApiProperty({
-  //   example: "Description du favori",
-  //   description: "Description (obligatoire pour les catégories génériques)",
-  // })
-  // @IsOptional()
-  // @IsString()
-  // description?: string;
-
-  // @ApiProperty({ example: "Justin Bieber", description: "Artiste (musique), Réalisateur (film), Auteur (livre)" })
-  // @IsOptional()
-  // @IsString()
-  // authorOrArtistOrDirector?: string;
-  @ApiProperty({
+    description:
+      "Titre du favori (optionnel, fallback sur un autre champ si absent)",
     required: false,
-    example: { titre: 'Mercredi', description: 'Top', realisateur: 'Burton' },
-    description: "Champs dynamiques de la catégorie (clé = name du champ)",
   })
   @IsOptional()
-  @IsObject()
-  fields?: Record<string, string>;
+  @IsString()
+  title?: string;
+
+  @ApiProperty({
+    example: "Description du favori",
+    description: "Description (obligatoire pour les catégories génériques)",
+  })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiProperty({
+    example: "Justin Bieber",
+    description: "Artiste (musique), Réalisateur (film), Auteur (livre)",
+  })
+  @IsOptional()
+  @IsString()
+  authorOrArtistOrDirector?: string;
 
   @ApiProperty({
     required: false,
@@ -90,23 +122,6 @@ export class FavoriteResponseDto {
   readonly createdAt: Date;
 }
 
-export class CategoryFieldDefinitionDto {
-  @ApiProperty({ example: "titre" })
-  @IsString()
-  name: string;
-
-  @ApiProperty({ example: "Titre" })
-  @IsString()
-  label: string;
-
-  @ApiProperty({ example: true })
-  required: boolean;
-
-  @ApiProperty({ example: "text", enum: ["text", "url", "number", "date"] })
-  @IsString()
-  type: "text" | "url" | "number" | "date";
-}
-
 export class CreateCategoryDto {
   @ApiProperty({ example: "music" })
   @IsString()
@@ -114,7 +129,15 @@ export class CreateCategoryDto {
   name: string;
 
   @ApiProperty({
-    title: "test titre",
+    required: false,
+    example: "🎵",
+    description: "Icône de la catégorie (optionnel, emoji ou url d'image)",
+  })
+  @IsOptional()
+  @IsString()
+  icon?: string;
+
+  @ApiProperty({
     type: [CategoryFieldDefinitionDto],
     description: "Définition des champs de la catégorie (autant que souhaité)",
   })

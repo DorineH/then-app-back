@@ -7,6 +7,7 @@ import {
   Length,
   Matches,
 } from "class-validator";
+import { Type } from 'class-transformer';
 
 const DATE_REGEX = /^(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$/; // YYYY-MM-DD
 const TIME_REGEX = /^(?:[01]\\d|2[0-3]):[0-5]\\d$/; // HH:mm
@@ -95,4 +96,17 @@ export class RangeQueryDto {
   @IsOptional()
   @Matches(DATE_REGEX)
   to?: string;
+}
+
+// DTO pour la requête de mois
+export class MonthQueryDto {
+  @ApiProperty({ example: '2025', description: 'Année sur 4 chiffres' })
+  @Type(() => String)
+  @Matches(/^\d{4}$/, { message: 'year must be YYYY' })
+  year!: string;
+
+  @ApiProperty({ example: '08', description: 'Mois sur 2 chiffres (01-12)' })
+  @Type(() => String)
+  @Matches(/^(0[1-9]|1[0-2]|[1-9])$/, { message: 'month must be MM (01-12)' })
+  month!: string;
 }

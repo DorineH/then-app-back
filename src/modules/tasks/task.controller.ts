@@ -23,6 +23,9 @@ import {
   UpdateTaskDto,
   DayQueryDto,
   RangeQueryDto,
+  
+  // Nouveau DTO pour la requête de mois
+  MonthQueryDto,
 } from "./dto/task.dto";
 import { mapTask, Task } from "./task.mapper";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
@@ -46,7 +49,6 @@ export class TasksController {
     @Req() req: any,
     @Query() query: DayQueryDto,
   ): Promise<Task[]> {
-    console.log("MMMMMMMMMMMMMMMMMMM");
     const user = req.user as AuthUser;
     const list = await this.service.findByDay(user.coupleId, query.date);
     return list.map(mapTask);
@@ -67,6 +69,23 @@ export class TasksController {
       query.from,
       query.to,
     );
+    return list.map(mapTask);
+  }
+
+  /**
+   * GET /tasks/month?year=YYYY&month=MM – tasks for a given month
+   */
+  @Get("month")
+  @ApiOkResponse({ type: [Object], description: "Tasks for a given month" })
+  async getByMonth(
+    @Req() req: any,
+    @Query() query: MonthQueryDto,
+  ): Promise<Task[]> {
+    const user = req.user as AuthUser;
+    const { userId, coupleId } = user;
+
+    console.log(user);
+    const list = await this.service.findByMonth(userId, coupleId, query.year, query.month);
     return list.map(mapTask);
   }
 

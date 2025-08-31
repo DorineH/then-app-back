@@ -11,6 +11,10 @@ export class FavoriteCategory {
   @Column()
   name: string;
 
+
+  @Column({ nullable: true })
+  icon?: string;
+
   @Column({ type: 'array', nullable: true })
   fields: {
     name: string;
