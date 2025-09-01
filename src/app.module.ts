@@ -7,6 +7,7 @@ import { AuthModule } from "./auth/auth.module";
 import { Favorite } from "./modules/favorites/entities/favorite.entity";
 import { FavoriteCategory } from "./modules/favorites/entities/category.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { MongooseModule } from '@nestjs/mongoose';
 import { TasksModule } from "./modules/tasks/task.module";
 import { TaskEntity } from "./modules/tasks/entities/task.entity";
 import { APP_GUARD } from "@nestjs/core";
@@ -15,10 +16,18 @@ import { EmotionEntity } from "./modules/emotions/entities/emotions.entity";
 import { EmotionsModule } from "./modules/emotions/emotions.module";
 import { UserModule } from "./modules/user/user.module";
 import { User } from "./modules/user/entities/user.entity";
+import { EmojimindModule } from "./modules/emojimind/emojimind.module";
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+      }),
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -35,6 +44,7 @@ import { User } from "./modules/user/entities/user.entity";
     EmotionsModule,
     AuthModule,
     TasksModule,
+    EmojimindModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: JwtAuthGuard }],
