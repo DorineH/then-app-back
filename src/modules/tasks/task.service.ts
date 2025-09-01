@@ -37,19 +37,37 @@ export class TasksService {
     return this.repo.find({ where, order: { date: "ASC", time: "ASC" } });
   }
 
-  async findByMonth(userId: string, coupleId: string, year: string, month: string): Promise<TaskEntity[]> {
-    // Format attendu: year = '2025', month = '08' ou '8'
-    // On construit les bornes du mois
-    const m = month.padStart(2, '0');
+  // async findByMonth(userId: string, coupleId: string, year: string, month: string): Promise<TaskEntity[]> {
+  //   // Format attendu: year = '2025', month = '08' ou '8'
+  //   // On construit les bornes du mois
+  //   const m = month.padStart(2, '0');
+  //   const from = `${year}-${m}-01`;
+  //   // Calcul du dernier jour du mois
+  //   const lastDay = new Date(Number(year), Number(month), 0).getDate();
+  //   const to = `${year}-${m}-${lastDay}`;
+  //   // Ajout du filtre userId
+  //   return this.repo.find({
+  //     where: {
+  //       coupleId,
+  //       userId,
+  //       date: { $gte: from, $lte: to },
+  //     },
+  //     order: { date: "ASC", time: "ASC" },
+  //   });
+  // }
+
+  async findByMonth(
+    coupleId: string,
+    year: string,
+    month: string,
+  ): Promise<TaskEntity[]> {
+    const m = month.padStart(2, "0");
     const from = `${year}-${m}-01`;
-    // Calcul du dernier jour du mois
     const lastDay = new Date(Number(year), Number(month), 0).getDate();
     const to = `${year}-${m}-${lastDay}`;
-    // Ajout du filtre userId
     return this.repo.find({
       where: {
         coupleId,
-        userId,
         date: { $gte: from, $lte: to },
       },
       order: { date: "ASC", time: "ASC" },

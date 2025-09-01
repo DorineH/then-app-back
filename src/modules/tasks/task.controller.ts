@@ -23,7 +23,7 @@ import {
   UpdateTaskDto,
   DayQueryDto,
   RangeQueryDto,
-  
+
   // Nouveau DTO pour la requête de mois
   MonthQueryDto,
 } from "./dto/task.dto";
@@ -85,7 +85,12 @@ export class TasksController {
     const { userId, coupleId } = user;
 
     console.log(user);
-    const list = await this.service.findByMonth(userId, coupleId, query.year, query.month);
+    // const list = await this.service.findByMonth(userId, coupleId, query.year, query.month);
+    const list = await this.service.findByMonth(
+      coupleId,
+      query.year,
+      query.month,
+    );
     return list.map(mapTask);
   }
 
