@@ -10,7 +10,7 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { CreateCategoryDto, CreateFavoriteDto, FavoriteResponseDto } from "./dto/favorites.dto";
+import { CreateCategoryDto, CreateFavoriteDto, FavoriteResponseDto, CategoryResponseDto } from "./dto/favorites.dto";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { FavoritesService } from "./favorites.service";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
@@ -32,19 +32,24 @@ export class FavoritesController {
 
   @ApiOperation({ summary: 'Lister les catégories' })
   @Get('categories')
-  async listCategories() {
-    return this.favoritesService.getCategories();
+  async listCategories(): Promise<CategoryResponseDto[]> {
+    const categories = await this.favoritesService.getCategories();
+    return categories.map(cat => ({
+      id: cat._id?.toString?.() ?? '',
+      name: cat.name,
+      icon: cat.icon,
+      fields: cat.fields,
+    }));
   }
 
   // ----- FAVORITES -----
   @Post('addFavorite')
-  @ApiOperation({ summary: "Créer un favori" })
+  @ApiOperation({ summary: "Créer un favori (le champ 'title' est optionnel, fallback sur un autre champ si absent)" })
   async create(
     @Body() createFavoritesDto: CreateFavoriteDto,
     @Req() req: any,
   ): Promise<Favorite> {
     const { userId, coupleId } = req.user;
-
     return this.favoritesService.createFavorite(userId, coupleId, createFavoritesDto);
   }
 
