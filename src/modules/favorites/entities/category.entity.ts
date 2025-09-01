@@ -3,14 +3,16 @@ import { ObjectId } from 'mongodb';
 import { Entity, ObjectIdColumn, Column, Index, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'favorite_categories' })
+@Index(["coupleId", "name"], { unique: true })
 export class FavoriteCategory {
   @ObjectIdColumn()
   _id: ObjectId;
 
-  @Index({ unique: true })
+  @Column()
+  coupleId: ObjectId;
+
   @Column()
   name: string;
-
 
   @Column({ nullable: true })
   icon?: string;

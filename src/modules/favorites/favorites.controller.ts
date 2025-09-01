@@ -26,14 +26,19 @@ export class FavoritesController {
   // ----- CATEGRIES -----
   @ApiOperation({ summary: 'Créer une catégorie' })
   @Post('categories')
-  async createCategory(@Body() dto: CreateCategoryDto) {
-    return this.favoritesService.createCategory(dto);
+  async createCategory(@Body() dto: CreateCategoryDto, @Req() req: any) {
+    const { coupleId } = req.user;
+    return this.favoritesService.createCategory(dto, coupleId);
   }
 
   @ApiOperation({ summary: 'Lister les catégories' })
   @Get('categories')
-  async listCategories(): Promise<CategoryResponseDto[]> {
-    const categories = await this.favoritesService.getCategories();
+  // async listCategories() {
+  //   return this.favoritesService.getCategories();
+  // }
+  async listCategories(@Req() req: any): Promise<CategoryResponseDto[]> {
+    const { coupleId } = req.user;
+    const categories = await this.favoritesService.getCategories(coupleId);
     return categories.map(cat => ({
       id: cat._id?.toString?.() ?? '',
       name: cat.name,

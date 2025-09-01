@@ -13,6 +13,8 @@ import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { EmotionEntity } from "./modules/emotions/entities/emotions.entity";
 import { EmotionsModule } from "./modules/emotions/emotions.module";
+import { UserModule } from "./modules/user/user.module";
+import { User } from "./modules/user/entities/user.entity";
 
 @Module({
   imports: [
@@ -23,12 +25,12 @@ import { EmotionsModule } from "./modules/emotions/emotions.module";
         type: "mongodb",
         url: configService.get<string>("MONGODB_URI"),
         useUnifiedTopology: true,
-        entities: [Favorite, FavoriteCategory, TaskEntity, EmotionEntity],
+        entities: [Favorite, FavoriteCategory, TaskEntity, EmotionEntity, User],
         synchronize: true, // set to false in production
       }),
       inject: [ConfigService],
     }),
-    // UserModule,
+    UserModule,
     FavoriteModule,
     EmotionsModule,
     AuthModule,

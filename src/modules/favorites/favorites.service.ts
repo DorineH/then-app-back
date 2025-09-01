@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { ConflictException, ForbiddenException, Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCategoryDto, CreateFavoriteDto } from "./dto/favorites.dto";
 import { DeepPartial, MongoRepository } from "typeorm";
@@ -20,7 +20,7 @@ export class FavoritesService {
   private oid(id: string | ObjectId) {
     if (typeof id === 'string') {
       if (!ObjectId.isValid(id)) {
-        throw new Error(`Invalid ObjectId: "${id}"`);
+        throw new BadRequestException(`coupleId invalide : "${id}" (doit être un ObjectId MongoDB)`);
       }
       return new ObjectId(id);
     }
@@ -28,10 +28,11 @@ export class FavoritesService {
   }
 
   // ---------- CATEGORIES ----------
-  async createCategory(dto: CreateCategoryDto) {
+  async createCategory(dto: CreateCategoryDto, coupleId: string) {
     const name = dto.name.trim().toLowerCase();
-    const exists = await this.catRepo.findOne({ where: { name } });
-    if (exists) throw new ConflictException('Cette catégorie existe déjà.');
+    // Unicité par coupleId + name
+    const exists = await this.catRepo.findOne({ where: { name, coupleId: this.oid(coupleId) } });
+    if (exists) throw new ConflictException('Cette catégorie existe déjà pour ce couple.');
     if (!dto.fields || !Array.isArray(dto.fields) || dto.fields.length === 0) {
       throw new ConflictException('Il faut définir au moins un champ pour la catégorie.');
     }
@@ -41,6 +42,7 @@ export class FavoritesService {
       }
     }
     const cat = this.catRepo.create({
+      coupleId: this.oid(coupleId),
       name,
       icon: dto.icon,
       fields: dto.fields,
@@ -48,18 +50,20 @@ export class FavoritesService {
     return this.catRepo.save(cat);
   }
 
-  async getCategories() {
-    return this.catRepo.find({ order: { name: 'ASC' } as any });
+  async getCategories(coupleId: string) {
+    return this.catRepo.find({ where: { coupleId: this.oid(coupleId) }, order: { name: 'ASC' } as any });
   }
 
   // ---------- FAVORITES ----------
+
   async createFavorite(
     userId: string,
     coupleId: string,
     createFavoriteDto: CreateFavoriteDto,
   ): Promise<Favorite> {
     const categoryName = createFavoriteDto.category.trim().toLowerCase();
-    const category = await this.catRepo.findOne({ where: { name: categoryName } });
+    // Recherche la catégorie du couple
+    const category = await this.catRepo.findOne({ where: { name: categoryName, coupleId: this.oid(coupleId) } });
     if (!category) throw new NotFoundException('Catégorie inconnue');
 
     // Construction dynamique des fields à partir de la définition de la catégorie
@@ -126,7 +130,7 @@ export class FavoritesService {
     coupleId: string,
     categoryName: string,
   ): Promise<Favorite[]> {
-    const category = await this.catRepo.findOne({ where: { name: (categoryName ?? '').trim().toLowerCase() } });
+    const category = await this.catRepo.findOne({ where: { name: (categoryName ?? '').trim().toLowerCase(), coupleId: this.oid(coupleId) } });
     if (!category) return [];
     return this.favRepo.find({
       where: { coupleId: this.oid(coupleId), categoryId: category._id },

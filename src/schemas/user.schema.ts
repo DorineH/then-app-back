@@ -13,6 +13,9 @@ export class User {
 
   @Prop()
   age: number;
+
+  @Prop({ required: true })
+  coupleId: string; // Ajout du coupleId pour lier l'utilisateur à un couple
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
